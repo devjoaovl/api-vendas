@@ -5,7 +5,7 @@ import lombok.Getter;
 
     @Getter
     @AllArgsConstructor
-    public class RelatorioVendedorDTO {
+    public class RelatorioVendedorResponse {
         private String nome;
         private Double totalVendas;
         private Double mediaDiaria;
