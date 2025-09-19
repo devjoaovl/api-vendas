@@ -1,41 +1,52 @@
 package xbrain.vendas.api.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import xbrain.vendas.api.dto.RelatorioVendedorDTO;
-import xbrain.vendas.api.entity.Venda;
+import xbrain.vendas.api.dto.VendaRequest;
+import xbrain.vendas.api.dto.VendedorRequest;
+import xbrain.vendas.api.dto.VendedorResponse;
+import xbrain.vendas.api.entity.Vendas;
+import xbrain.vendas.api.entity.Vendedor;
 import xbrain.vendas.api.repository.VendaRepository;
+import xbrain.vendas.api.repository.VendedorRepository;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class VendaService {
     private final VendaRepository vendaRepository;
+    private final VendedorRepository vendedorRepository;
 
-    public VendaService(VendaRepository vendaRepository) {
-        this.vendaRepository = vendaRepository;
+
+    public Vendas criarVenda(VendaRequest request) {
+        return vendaRepository.save(Vendas.of(request));
     }
 
-    public Venda criarVenda(Venda venda) {
-        return vendaRepository.save(venda);
+    public Vendedor criarVendedor(VendedorRequest request) {
+        return vendedorRepository.save(Vendedor.of(request));
     }
 
-    public List<RelatorioVendedorDTO> relatorio(LocalDate inicio, LocalDate fim) {
-        List<Venda> vendas = vendaRepository.findByPeriodo(inicio, fim);
-        long dias = ChronoUnit.DAYS.between(inicio, fim) + 1;
+    public List<Vendas> listarTodasVendas() {
+        return vendaRepository.findAll();
+    }
 
-        return vendas.stream()
-                .collect(Collectors.groupingBy(Venda::getVendedorNome,
-                        Collectors.summingDouble(Venda::getValor)))
-                .entrySet()
-                .stream()
-                .map(e -> new RelatorioVendedorDTO(
-                        e.getKey(),
-                        e.getValue(),
-                        e.getValue() / dias
-                ))
-                .collect(Collectors.toList());
+
+
+    public List<VendedorResponse> relatorio(LocalDate inicio, LocalDate fim) {
+        return vendedorRepository.findAll().stream()
+                .map(vendedor -> {
+                    var totalVendas = vendaRepository.countByPeriodo(inicio, fim, vendedor.getId());
+
+                    long dias = ChronoUnit.DAYS.between(inicio, fim) + 1;
+                    double mediaDiaria = dias > 0 ? totalVendas.doubleValue() / dias : 0.0;
+
+                    VendedorResponse resp = new VendedorResponse();
+                    resp.of(vendedor, totalVendas, mediaDiaria);
+                    return resp;
+                })
+                .toList();
     }
 }
