@@ -39,13 +39,7 @@ public class VendaService {
         return vendedorRepository.findAll().stream()
                 .map(vendedor -> {
                     var totalVendas = vendaRepository.countByPeriodo(inicio, fim, vendedor.getId());
-
-                    long dias = ChronoUnit.DAYS.between(inicio, fim) + 1;
-                    double mediaDiaria = dias > 0 ? totalVendas.doubleValue() / dias : 0.0;
-
-                    VendedorResponse resp = new VendedorResponse();
-                    resp.of(vendedor, totalVendas, mediaDiaria);
-                    return resp;
+                    return VendedorResponse.of(vendedor, totalVendas, 0.0);
                 })
                 .toList();
     }
