@@ -11,15 +11,13 @@ import xbrain.vendas.api.entity.Vendedor;
 @AllArgsConstructor
 public class VendedorResponse {
 
-    private String vendedorNome;
-    private Long totalVendas;
-    private Double mediaDiaria;
+    private long id;
+    private String nome;
 
-    public static VendedorResponse of(Vendedor vendedor, Long totalVendas, Double mediaDiaria) {
+    public static VendedorResponse  of(Vendedor vendedor) {
         return VendedorResponse.builder()
-                .vendedorNome(vendedor.getNome())
-                .totalVendas(totalVendas != null ? totalVendas : 0L)
-                .mediaDiaria(mediaDiaria != null ? mediaDiaria : 0.0)
+                .id(vendedor.getId())
+                .nome(vendedor.getNome())
                 .build();
     }
 }
