@@ -15,4 +15,11 @@ public interface VendaRepository extends JpaRepository<Vendas, Long> {
     Long countByPeriodo(@Param("inicio") LocalDate inicio,
                         @Param("fim") LocalDate fim,
                         @Param("idVendedor") Long idVendedor);
+
+    @Query("SELECT COALESCE(SUM(v.valor), 0) FROM Vendas v " +
+            "WHERE v.dataVenda BETWEEN :inicio AND :fim " +
+            "AND v.vendedor.id = :idVendedor")
+    Double sumByPeriodo(@Param("inicio") LocalDate inicio,
+                        @Param("fim") LocalDate fim,
+                        @Param("idVendedor") Long idVendedor);
 }
