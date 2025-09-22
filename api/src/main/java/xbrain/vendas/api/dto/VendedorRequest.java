@@ -13,6 +13,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VendedorRequest {
-    private String nome;
 
+    private String nome;
 }
